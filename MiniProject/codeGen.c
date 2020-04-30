@@ -38,31 +38,34 @@ int evaluateTree(BTNode *root) {
                 lv = evaluateTree(root->left);
                 rv = evaluateTree(root->right);
                 if (strcmp(root->lexeme, "+") == 0) {
-                    registerRestore(root->right->reg);
+                    registerRestoreNum7(root->right->reg);
                     retval = lv + rv;
                     printf("ADD r%d r%d\n", root->left->reg, root->right->reg);
                     root->reg = root->left->reg;
                     r--;
-                } else if (strcmp(root->lexeme, "-") == 0) {
                     registerRestore(root->right->reg);
+                } else if (strcmp(root->lexeme, "-") == 0) {
+                    registerRestoreNum7(root->right->reg);
                     retval = lv - rv;
                     printf("SUB r%d r%d\n", root->left->reg, root->right->reg);
                     root->reg = root->left->reg;
                     r--;
                 } else if (strcmp(root->lexeme, "*") == 0) {
-                    registerRestore(root->right->reg);
+                    registerRestoreNum7(root->right->reg);
                     retval = lv * rv;
                     printf("MUL r%d r%d\n", root->left->reg, root->right->reg);
                     root->reg = root->left->reg;
                     r--;
+                    registerRestore(root->right->reg);
                 } else if (strcmp(root->lexeme, "/") == 0) {
                     if (rv == 0)
                         error(DIVZERO);
-                    registerRestore(root->right->reg);
+                    registerRestoreNum7(root->right->reg);
                     retval = lv / rv;
                     printf("DIV r%d r%d\n", root->left->reg, root->right->reg);
                     root->reg = root->left->reg;
                     r--;
+                    registerRestore(root->right->reg);
                 }
                 break;
             case LOGICAL:
@@ -109,18 +112,24 @@ void printPrefix(BTNode *root) {
 }
 
 void registerStore(void){
-    if(r==7){
-        for(int i=0;i<7;i++){
+    if(r==8){
+        for(int i=0;i<8;i++){
             printf("MOV [%d] r%d\n", (sbcount++)*4, i);
         }
         r = 0;
     }
 }
 
+void registerRestoreNum7(int reg){
+    if(reg == 0){
+        printf("MOV r%d [%d]\n", 7, (--sbcount)*4);
+    }
+}
+
 void registerRestore(int reg){
     if(reg == 0){
         for(int i=6;i>=0;i--){
-            printf("MOV r%d [%d]\n", i, (sbcount--)*4);
+            printf("MOV r%d [%d]\n", i, (--sbcount)*4);
         }
         r = 8;
     }

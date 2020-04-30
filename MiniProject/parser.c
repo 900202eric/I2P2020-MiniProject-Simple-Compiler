@@ -276,5 +276,6 @@ void err_(ErrorType errorNum) {
                 break;
         }
     }
+    printf("EXIT 1\n");
     exit(0);
 }
