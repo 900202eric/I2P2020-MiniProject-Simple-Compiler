@@ -8,6 +8,7 @@ int evaluateTree(BTNode *root) {
     int retval = 0, lv = 0, rv = 0, address = -1;;
 
     if (root != NULL) {
+        registerStore();
         switch (root->data) {
             case ID:
                 retval = getval(root->lexeme);
@@ -37,16 +38,19 @@ int evaluateTree(BTNode *root) {
                 lv = evaluateTree(root->left);
                 rv = evaluateTree(root->right);
                 if (strcmp(root->lexeme, "+") == 0) {
+                    registerRestore(root->right->reg);
                     retval = lv + rv;
                     printf("ADD r%d r%d\n", root->left->reg, root->right->reg);
                     root->reg = root->left->reg;
                     r--;
                 } else if (strcmp(root->lexeme, "-") == 0) {
+                    registerRestore(root->right->reg);
                     retval = lv - rv;
                     printf("SUB r%d r%d\n", root->left->reg, root->right->reg);
                     root->reg = root->left->reg;
                     r--;
                 } else if (strcmp(root->lexeme, "*") == 0) {
+                    registerRestore(root->right->reg);
                     retval = lv * rv;
                     printf("MUL r%d r%d\n", root->left->reg, root->right->reg);
                     root->reg = root->left->reg;
@@ -54,6 +58,7 @@ int evaluateTree(BTNode *root) {
                 } else if (strcmp(root->lexeme, "/") == 0) {
                     if (rv == 0)
                         error(DIVZERO);
+                    registerRestore(root->right->reg);
                     retval = lv / rv;
                     printf("DIV r%d r%d\n", root->left->reg, root->right->reg);
                     root->reg = root->left->reg;
@@ -64,16 +69,19 @@ int evaluateTree(BTNode *root) {
                 lv = evaluateTree(root->left);
                 rv = evaluateTree(root->right);
                 if (strcmp(root->lexeme, "&") == 0) {
+                    registerRestore(root->right->reg);
                     retval = lv & rv;
                     printf("AND r%d r%d\n", root->left->reg, root->right->reg);
                     root->reg = root->left->reg;
                     r--;
                 } else if (strcmp(root->lexeme, "|") == 0) {
+                    registerRestore(root->right->reg);
                     retval = lv | rv;
                     printf("OR r%d r%d\n", root->left->reg, root->right->reg);
                     root->reg = root->left->reg;
                     r--;
                 } else if (strcmp(root->lexeme, "^") == 0) {
+                    registerRestore(root->right->reg);
                     retval = lv ^ rv;
                     printf("XOR r%d r%d\n", root->left->reg, root->right->reg);
                     root->reg = root->left->reg;
@@ -97,5 +105,23 @@ void printPrefix(BTNode *root) {
         printf("%s ", root->lexeme);
         printPrefix(root->left);
         printPrefix(root->right);
+    }
+}
+
+void registerStore(void){
+    if(r==7){
+        for(int i=0;i<7;i++){
+            printf("MOV [%d] r%d\n", (sbcount++)*4, i);
+        }
+        r = 0;
+    }
+}
+
+void registerRestore(int reg){
+    if(reg == 0){
+        for(int i=6;i>=0;i--){
+            printf("MOV r%d [%d]\n", i, (sbcount--)*4);
+        }
+        r = 8;
     }
 }
