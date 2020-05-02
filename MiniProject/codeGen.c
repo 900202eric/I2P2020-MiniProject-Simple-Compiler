@@ -72,23 +72,26 @@ int evaluateTree(BTNode *root) {
                 lv = evaluateTree(root->left);
                 rv = evaluateTree(root->right);
                 if (strcmp(root->lexeme, "&") == 0) {
-                    registerRestore(root->right->reg);
+                    registerRestoreNum7(root->right->reg);
                     retval = lv & rv;
                     printf("AND r%d r%d\n", root->left->reg, root->right->reg);
                     root->reg = root->left->reg;
                     r--;
-                } else if (strcmp(root->lexeme, "|") == 0) {
                     registerRestore(root->right->reg);
+                } else if (strcmp(root->lexeme, "|") == 0) {
+                    registerRestoreNum7(root->right->reg);
                     retval = lv | rv;
                     printf("OR r%d r%d\n", root->left->reg, root->right->reg);
                     root->reg = root->left->reg;
                     r--;
-                } else if (strcmp(root->lexeme, "^") == 0) {
                     registerRestore(root->right->reg);
+                } else if (strcmp(root->lexeme, "^") == 0) {
+                    registerRestoreNum7(root->right->reg);
                     retval = lv ^ rv;
                     printf("XOR r%d r%d\n", root->left->reg, root->right->reg);
                     root->reg = root->left->reg;
                     r--;
+                    registerRestore(root->right->reg);
                 }
                 break;
             case INCDEC:

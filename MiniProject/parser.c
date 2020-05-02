@@ -104,6 +104,34 @@ BTNode *factor(void) {
                 advance();
             else
                 error(MISPAREN);
+        } else if (match(INCDEC)) {
+            retp->right = makeNode(ASSIGN, "=");
+            char *op = getLexeme();
+            if(strcmp(op, "++") == 0){
+                advance();
+                if (match(ID)) {
+                    char *cg = getLexeme();
+                    retp->right->left = makeNode(ID, cg);
+                    retp->right->right = makeNode(ADDSUB, "+");
+                    retp->right->right->left = makeNode(ID, cg);
+                    retp->right->right->right = makeNode(INT, "1");
+                    advance();
+                } else {
+                    error(NOTNUMID);
+                }
+            } else if(strcmp(op, "--") == 0){
+                advance();
+                if (match(ID)) {
+                    char *cg = getLexeme();
+                    retp->right->left = makeNode(ID, cg);
+                    retp->right->right = makeNode(ADDSUB, "-");
+                    retp->right->right->left = makeNode(ID, cg);
+                    retp->right->right->right = makeNode(INT, "1");
+                    advance();
+                } else {
+                    error(NOTNUMID);
+                }
+            }
         } else {
             error(NOTNUMID);
         }
